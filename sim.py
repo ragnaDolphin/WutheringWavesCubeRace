@@ -2,10 +2,18 @@ import cube_sim
 
 result = {}
 for i in range(0,1000):
-    name = cube_sim.main()
-    if name not in result.keys():
-        result[name] = 0
-    result[name] += 1
+    match_result = cube_sim.main()
+    j = 1
+    for name in match_result:
+        if name not in result.keys():
+            result[name] = {}
+        if j not in result[name].keys():
+            result[name][j] = 0
+        result[name][j] += 1
+        j += 1
 
 for key in result:
-    print("%s获得了%d次冠军"%(key,result[key]))
+    print("%s的成绩："%key)
+    rank = 1
+    for rank in range(1,7):
+        print("第%d名：%d次"%(rank,result[key][rank]))

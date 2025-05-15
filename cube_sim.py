@@ -20,6 +20,7 @@ def main():
             self.TOTAL_LENGTH = 24
             self.CHANGLI_ABILITY = False
             self.CUBE_GROUPS = []
+            self.cur_turn = 1
 
         def get_cube_group(self,position):
             for cube_group in self.CUBE_GROUPS:
@@ -46,23 +47,29 @@ def main():
 
         def turn_process(self):
             random.shuffle(self.cube_list)
+
+            if self.params.CHANGLI_ABILITY:
+                self.cube_list.remove(self.cube_dict[CUBE_NAMES.长离])
+                self.cube_list.append(self.cube_dict[CUBE_NAMES.长离])
+                self.params.CHANGLI_ABILITY = False
+
             if DEBUG:
                 cube_order = []
                 for cube in self.cube_list:
                     cube_order.append(cube.name.name)
                 print("行动顺序为：",cube_order)
-            if self.params.CHANGLI_ABILITY:
-                self.cube_list.remove(self.cube_dict[CUBE_NAMES.长离])
-                self.cube_list.append(self.cube_dict[CUBE_NAMES.长离])
-                self.params.CHANGLI_ABILITY = False
                 
             for cube in self.cube_list:
                 cube.act()
                 self.update_rank()
                 if cube.position >= self.params.TOTAL_LENGTH:
+                    # for _cube in self.cube_list:
+                    #     if _cube.rank == 1:
+                    #         return _cube.name
+                    cube_rank = []
                     for _cube in self.cube_list:
-                        if _cube.rank == 1:
-                            return _cube.name
+                        cube_rank.append(_cube.name.name)
+                    return cube_rank
                         
             if self.cube_dict[CUBE_NAMES.长离].height > 1 and random.random() <= 0.65:
                 if DEBUG:
@@ -73,25 +80,26 @@ def main():
 
         def main(self):
             self.init_cubes()
-            turn_num = 1
+            self.params.cur_turn = 1
             while True:
                 if DEBUG:
-                    print("-----第%d回合开始-----"%turn_num)
-                winner = self.turn_process()
-                turn_num += 1
+                    print("-----第%d回合开始-----"%self.params.cur_turn)
+                result = self.turn_process()
+                self.params.cur_turn += 1
                 self.params.CUBE_GROUPS.sort(key=lambda x: (-x.position))
                 if DEBUG:
-                    print("-----第%d回合结束，当前场况：-----"%turn_num)
+                    print("-----第%d回合结束，当前场况：-----"%self.params.cur_turn)
                     for cube_group in self.params.CUBE_GROUPS:
                         cube_list = []
                         for cube in cube_group.cubes:
                             cube_list.append(cube.name.name)
                         print("第%d格："%cube_group.position,cube_list)
-                if winner:
+                if result:
                     break
             if DEBUG:
-                print("冠军是%s"%winner.name)
-            return winner.name
+                # print("冠军是%s"%winner.name)
+                print("结果是",result)
+            return result
 
     class CubeGroup():
         def __init__(self,cubes,params):
@@ -207,7 +215,7 @@ def main():
                 print("%s团子 初始骰出 %d 点"%(self.name.name,self.dice_point))
             
             if self.name == CUBE_NAMES.卡卡罗:
-                if self.rank == 6 and self.position != 1:
+                if self.rank == 6 and self.params.cur_turn != 1:
                     self.dice_point += 3
                     if DEBUG:
                             print("---卡卡罗技能发动！！---")
