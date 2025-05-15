@@ -124,9 +124,6 @@ def main():
                 cube.cube_group = self
             self.params.CUBE_GROUPS.remove(target_cube_group)
 
-
-
-
     class Cube():
         def __init__(self, chara_name,params):
             self.name = chara_name
@@ -141,9 +138,6 @@ def main():
         @property
         def height(self):
             return self.cube_group.cubes.index(self)+1
-
-    # random.randint
-    # random.random
 
         def move(self):
             if DEBUG:
