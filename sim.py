@@ -14,7 +14,7 @@ for i in range(0,total_match_num):
         j += 1
 
 for key in result:
-    print("%s的成绩："%key)
+    print("---%s的成绩：---"%key)
     rank = 1
     for rank in range(1,7):
         print("第%d名：%d次"%(rank,result[key][rank]))

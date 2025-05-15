@@ -7,13 +7,19 @@ import random
 DEBUG = (__name__ == "__main__")
 
 def main():
+    # 在这里设置起始位置
     class CUBE_NAMES(Enum):
-        守岸人 = 1
-        卡卡罗 = 2
-        今汐 = 3
-        长离 = 4
-        椿 = 5
-        小土豆 = 6
+        守岸人 = ("守岸人", 1)
+        卡卡罗 = ("卡卡罗", 1)
+        今汐 = ("今汐", 1)
+        长离 = ("长离", 1)
+        椿 = ("椿", 1)
+        小土豆 = ("小土豆", 1)
+
+        def __init__(self, chara_name, start_position):
+            self.chara_name = chara_name  # 存储人物名字
+            self.start_position = start_position     # 存储起始位置
+
 
     class Paramaters():
         def __init__(self):
@@ -138,7 +144,7 @@ def main():
             self.flower_ability = False
             self.rank = 0
             self.dice_point = 0
-            self.position = 1
+            self.position = chara_name.start_position
             # self.height = 1
             self.cube_group = CubeGroup(self,params)
             self.params = params
