@@ -7,9 +7,6 @@ import random
 DEBUG = (__name__ == "__main__")
 
 def main():
-    
-    # CUBE_GROUPS = []
-
     class CUBE_NAMES(Enum):
         守岸人 = 1
         卡卡罗 = 2
@@ -33,12 +30,11 @@ def main():
     class Match():
         def __init__(self):
             self.params = Paramaters()
-
-        def init_cubes(self):
             self.cube_list = []
             self.cube_dict = {}
+
+        def init_cubes(self):
             for name in CUBE_NAMES:
-                # print("初始化%s团子"%name.name)
                 cube = Cube(name,self.params)
                 self.cube_list.append(cube)
                 self.cube_dict[name] = cube
@@ -76,7 +72,6 @@ def main():
             return False
 
         def main(self):
-            # print("初始化团子")
             self.init_cubes()
             turn_num = 1
             while True:
@@ -160,7 +155,6 @@ def main():
 
             target_cube_group = self.params.get_cube_group(self.position + self.dice_point)
 
-
             if self.flower_ability:
                 self.cube_group.cubes.remove(self)
                 if len(self.cube_group.cubes) == 0:
@@ -199,14 +193,10 @@ def main():
             for cube in self.cube_group.cubes:
                 final_cube_group_mamber.append(cube.name.name)
 
-            
-
             if DEBUG:
                 print("当前组: ",cur_cube_group_member)
                 print("移动组: ",move_cube_group_mamber)
                 print("最终组: ",final_cube_group_mamber)
-
-                
 
         def have_top(self):
             if self.height < self.cube_group.total_height:
@@ -246,7 +236,6 @@ def main():
         def move_to_top(self):
             self.cube_group.cubes.remove(self)
             self.cube_group.cubes.append(self)
-
     
     return Match().main()
 
