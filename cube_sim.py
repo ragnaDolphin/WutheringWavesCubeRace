@@ -6,6 +6,10 @@ import random
 
 DEBUG = (__name__ == "__main__")
 
+def ability_active_notice(chara_name):
+    if DEBUG:
+        print("---%s技能发动！！---"%chara_name)
+
 def main():
     # 在这里设置起始位置
     class CUBE_NAMES(Enum):
@@ -15,16 +19,36 @@ def main():
         长离 = ("长离", 1)
         椿 = ("椿", 1)
         小土豆 = ("小土豆", 1)
+        洛可可 = ("洛可可", 1)
+        船长 = ("船长", 1)
+        坎特蕾拉 = ("坎特蕾拉", 1)
+        赞妮 = ("赞妮", 1)
+        卡提希亚 = ("卡提希亚", 1)
+        菲比 = ("菲比", 1)
 
         def __init__(self, chara_name, start_position):
             self.chara_name = chara_name  # 存储人物名字
             self.start_position = start_position     # 存储起始位置
 
+    # 在这里设置参赛选手
+    match_cubes = [
+        CUBE_NAMES.洛可可,
+        CUBE_NAMES.船长,
+        CUBE_NAMES.坎特蕾拉,
+        CUBE_NAMES.赞妮,
+        CUBE_NAMES.卡提希亚,
+        CUBE_NAMES.菲比,
+    ]
 
     class Paramaters():
         def __init__(self):
             self.TOTAL_LENGTH = 24
             self.CHANGLI_ABILITY = False
+            self.ROCOCO_ABILITY = False
+            self.CAPTAIN_ABILITY = False
+            self.ZANI_ABILITY = False
+            self.KATI_ABILITY = False
+            self.CANTARELLA_ABILITY = True
             self.CUBE_GROUPS = []
             self.cur_turn = 1
 
@@ -41,7 +65,7 @@ def main():
             self.cube_dict = {}
 
         def init_cubes(self):
-            for name in CUBE_NAMES:
+            for name in match_cubes:
                 cube = Cube(name,self.params)
                 self.cube_list.append(cube)
                 self.cube_dict[name] = cube
@@ -64,20 +88,31 @@ def main():
                 for cube in self.cube_list:
                     cube_order.append(cube.name.name)
                 print("行动顺序为：",cube_order)
+
+            if CUBE_NAMES.洛可可 in match_cubes and self.cube_list.index(self.cube_dict[CUBE_NAMES.洛可可]) == 5:
+                self.params.ROCOCO_ABILITY = True
+
+            if CUBE_NAMES.船长 in match_cubes and self.cube_list.index(self.cube_dict[CUBE_NAMES.船长]) == 0:
+                self.params.CAPTAIN_ABILITY = True
                 
             for cube in self.cube_list:
                 cube.act()
                 self.update_rank()
+                if DEBUG and cube.name == CUBE_NAMES.卡提希亚 and not self.params.KATI_ABILITY:
+                    print("卡提希亚当前排名：",cube.rank)
+
+                if cube.name == CUBE_NAMES.卡提希亚 and not self.params.KATI_ABILITY and cube.rank == 6:
+                    ability_active_notice(cube.name.chara_name)
+                    self.params.KATI_ABILITY = True
+
                 if cube.position >= self.params.TOTAL_LENGTH:
-                    # for _cube in self.cube_list:
-                    #     if _cube.rank == 1:
-                    #         return _cube.name
-                    cube_rank = []
-                    for _cube in self.cube_list:
-                        cube_rank.append(_cube.name.name)
-                    return cube_rank
+                    result = []
+                    cube_rank = sorted(self.cube_list, key=lambda x: (-x.position, -x.height))
+                    for _cube in cube_rank:
+                        result.append(_cube.name.name)
+                    return result
                         
-            if self.cube_dict[CUBE_NAMES.长离].height > 1 and random.random() <= 0.65:
+            if CUBE_NAMES.长离 in match_cubes and self.cube_dict[CUBE_NAMES.长离].height > 1 and random.random() <= 0.65:
                 if DEBUG:
                     print("---长离技能发动！！---")
                 self.params.CHANGLI_ABILITY = True
@@ -139,7 +174,7 @@ def main():
             self.params.CUBE_GROUPS.remove(target_cube_group)
 
     class Cube():
-        def __init__(self, chara_name,params):
+        def __init__(self, chara_name,params:Paramaters):
             self.name = chara_name
             self.flower_ability = False
             self.rank = 0
@@ -153,15 +188,17 @@ def main():
         def height(self):
             return self.cube_group.cubes.index(self)+1
 
-        def move(self):
+        def move(self, cur_position, target_position):
             if DEBUG:
-                print("%s团子 骰出 %d 点，从 %d 位置前进到 %d 位置"%(self.name.name,self.dice_point,self.position,self.position + self.dice_point))
+                print("%s团子从 %d 位置前进到 %d 位置"%(self.name.name,cur_position,target_position))
             cur_cube_group_member = []
             move_cube_group_mamber = []
+
             for cube in self.cube_group.cubes:
                 cur_cube_group_member.append(cube.name.name)
 
-            target_cube_group = self.params.get_cube_group(self.position + self.dice_point)
+            target_cube_group = self.params.get_cube_group(target_position)
+
 
             if self.flower_ability:
                 self.cube_group.cubes.remove(self)
@@ -179,18 +216,18 @@ def main():
                     cube.cube_group = upper_cube_group
 
             for cube in self.cube_group.cubes:
-                move_cube_group_mamber.append(cube.name.name)
+                move_cube_group_mamber.append(cube.name.chara_name)
 
-            self.cube_group.position += self.dice_point
+            self.cube_group.position = target_position
             for cube in self.cube_group.cubes:
-                cube.position += self.dice_point
+                cube.position = target_position
 
             if target_cube_group:
                 self.cube_group.combine(target_cube_group)
             final_cube_group_mamber = []
 
             for cube in self.cube_group.cubes:
-                if cube.name == CUBE_NAMES.今汐 and self.name != CUBE_NAMES.今汐:
+                if CUBE_NAMES.今汐 in match_cubes and cube.name == CUBE_NAMES.今汐 and self.name != CUBE_NAMES.今汐:
                     if cube.have_top() and (random.random() <= 0.4):
                         original_height = cube.height
                         cube.move_to_top()
@@ -200,6 +237,7 @@ def main():
 
             for cube in self.cube_group.cubes:
                 final_cube_group_mamber.append(cube.name.name)
+
 
             if DEBUG:
                 print("当前组: ",cur_cube_group_member)
@@ -217,29 +255,79 @@ def main():
             if self.name == CUBE_NAMES.守岸人:
                 self.dice_point = random.randint(2,3)
 
+            if self.name == CUBE_NAMES.赞妮:
+                self.dice_point = random.choice([1,3])
+                if self.cube_group.total_height > 1 and random.random() <= 0.4:
+                    self.params.ZANI_ABILITY = True
+                    ability_active_notice(self.name.chara_name)
+
             if DEBUG:
                 print("%s团子 初始骰出 %d 点"%(self.name.name,self.dice_point))
-            
+
+            if self.name == CUBE_NAMES.赞妮 and self.params.ZANI_ABILITY:
+                self.params.ZANI = False
+                self.dice_point += 2
+
             if self.name == CUBE_NAMES.卡卡罗:
                 if self.rank == 6 and self.params.cur_turn != 1:
                     self.dice_point += 3
-                    if DEBUG:
-                            print("---卡卡罗技能发动！！---")
+                    ability_active_notice(self.name.chara_name)
 
             if self.name == CUBE_NAMES.小土豆:
                 if random.random() <= 0.28:
                     self.dice_point = self.dice_point*2
-                    if DEBUG:
-                        print("---小土豆技能发动！！---")
+                    ability_active_notice(self.name.chara_name)
 
             if self.name == CUBE_NAMES.椿:
                 if random.random() <= 0.5 and self.cube_group.total_height >1:
                     self.dice_point = self.dice_point + self.cube_group.total_height - 1
-                    if DEBUG:
-                        print("---椿技能发动！！---")
+                    ability_active_notice(self.name.chara_name)
                     self.flower_ability = True
 
-            self.move()
+            if self.name == CUBE_NAMES.洛可可 and self.params.ROCOCO_ABILITY:
+                self.params.ROCOCO_ABILITY = False
+                self.dice_point += 2
+                ability_active_notice(self.name.chara_name)
+
+            if self.name == CUBE_NAMES.船长 and self.params.CAPTAIN_ABILITY:
+                self.params.CAPTAIN_ABILITY = False
+                self.dice_point += 2
+                ability_active_notice(self.name.chara_name)
+
+            if self.name == CUBE_NAMES.卡提希亚 and self.params.KATI_ABILITY and random.random() <= 0.6:
+                ability_active_notice(self.name.chara_name)
+                self.dice_point += 2
+
+            if self.name == CUBE_NAMES.菲比 and random.random() <= 0.5:
+                ability_active_notice(self.name.chara_name)
+                self.dice_point += 1
+
+            if self.name == CUBE_NAMES.坎特蕾拉 and self.params.CANTARELLA_ABILITY:
+                canta_target_position = self.position + self.dice_point
+
+                move_combine_group = False
+                for cube_group in self.params.CUBE_GROUPS:
+                    cur_move_combine_group_position = 99
+                    if cube_group.position > self.position and cube_group.position < (self.position + self.dice_point) and cube_group.position < cur_move_combine_group_position:
+                        cur_move_combine_group_position = cube_group.position
+                        move_combine_group = cube_group
+
+                if move_combine_group:
+                    self.params.CANTARELLA_ABILITY = False
+                    ability_active_notice(self.name.chara_name)
+
+                    if DEBUG:
+                        if not self.params.get_cube_group(canta_target_position):
+                            print('debug')
+
+                    self.move(self.position, move_combine_group.position)
+                    for cube in self.cube_group.cubes:
+                        if cube.height == 1:
+                            cube.move(cube.position, canta_target_position)
+                            break
+                    return
+                
+            self.move(self.position,self.position + self.dice_point)
 
         def move_to_top(self):
             self.cube_group.cubes.remove(self)
