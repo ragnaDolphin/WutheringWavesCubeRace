@@ -126,7 +126,7 @@ def main():
                 if DEBUG:
                     print("-----第%d回合开始-----"%self.params.cur_turn)
                 result = self.turn_process()
-                self.params.cur_turn += 1
+                
                 self.params.CUBE_GROUPS.sort(key=lambda x: (-x.position))
                 if DEBUG:
                     print("-----第%d回合结束，当前场况：-----"%self.params.cur_turn)
@@ -135,6 +135,8 @@ def main():
                         for cube in cube_group.cubes:
                             cube_list.append(cube.name.name)
                         print("第%d格："%cube_group.position,cube_list)
+
+                self.params.cur_turn += 1
                 if result:
                     break
             if DEBUG:
@@ -265,7 +267,7 @@ def main():
                 print("%s团子 初始骰出 %d 点"%(self.name.name,self.dice_point))
 
             if self.name == CUBE_NAMES.赞妮 and self.params.ZANI_ABILITY:
-                self.params.ZANI = False
+                self.params.ZANI_ABILITY = False
                 self.dice_point += 2
 
             if self.name == CUBE_NAMES.卡卡罗:
@@ -316,9 +318,9 @@ def main():
                     self.params.CANTARELLA_ABILITY = False
                     ability_active_notice(self.name.chara_name)
 
-                    if DEBUG:
-                        if not self.params.get_cube_group(canta_target_position):
-                            print('debug')
+                    # if DEBUG:
+                    #     if not self.params.get_cube_group(canta_target_position):
+                    #         print('debug')
 
                     self.move(self.position, move_combine_group.position)
                     for cube in self.cube_group.cubes:
