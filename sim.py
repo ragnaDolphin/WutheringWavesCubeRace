@@ -1,6 +1,6 @@
 import cube_sim
 
-total_match_num = 1000
+total_match_num = 10000
 result = {}
 for i in range(0,total_match_num):
     match_result = cube_sim.main()
