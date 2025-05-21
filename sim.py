@@ -16,9 +16,10 @@ for i in range(0,total_match_num):
 for key in result:
     print("---%s的成绩：---"%key)
     rank = 1
-    for rank in range(1,7):
+    max_rank = len(result[key].keys())
+    for rank in range(1,max_rank + 1):
         print("第%d名：%d次"%(rank,result[key][rank]))
     no1_rate = result[key][1] / total_match_num * 100
-    win_rate = (result[key][1] + result[key][2] + result[key][3] + result[key][4]) / total_match_num * 100
+    win_rate = (result[key][1] + result[key][2]) / total_match_num * 100
     print('夺冠率：%.2f%%'%no1_rate)
     print('晋级率：%.2f%%'%win_rate)

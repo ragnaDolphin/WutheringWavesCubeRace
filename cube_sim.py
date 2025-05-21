@@ -34,9 +34,7 @@ def main():
     match_cubes = [
         CUBE_NAMES.洛可可,
         CUBE_NAMES.船长,
-        CUBE_NAMES.坎特蕾拉,
         CUBE_NAMES.赞妮,
-        CUBE_NAMES.卡提希亚,
         CUBE_NAMES.菲比,
     ]
 
@@ -89,7 +87,7 @@ def main():
                     cube_order.append(cube.name.name)
                 print("行动顺序为：",cube_order)
 
-            if CUBE_NAMES.洛可可 in match_cubes and self.cube_list.index(self.cube_dict[CUBE_NAMES.洛可可]) == 5:
+            if CUBE_NAMES.洛可可 in match_cubes and self.cube_list.index(self.cube_dict[CUBE_NAMES.洛可可]) == (len(match_cubes) - 1):
                 self.params.ROCOCO_ABILITY = True
 
             if CUBE_NAMES.船长 in match_cubes and self.cube_list.index(self.cube_dict[CUBE_NAMES.船长]) == 0:
@@ -101,7 +99,7 @@ def main():
                 if DEBUG and cube.name == CUBE_NAMES.卡提希亚 and not self.params.KATI_ABILITY:
                     print("卡提希亚当前排名：",cube.rank)
 
-                if cube.name == CUBE_NAMES.卡提希亚 and not self.params.KATI_ABILITY and cube.rank == 6:
+                if cube.name == CUBE_NAMES.卡提希亚 and not self.params.KATI_ABILITY and cube.rank == len(match_cubes):
                     ability_active_notice(cube.name.chara_name)
                     self.params.KATI_ABILITY = True
 
@@ -271,7 +269,7 @@ def main():
                 self.dice_point += 2
 
             if self.name == CUBE_NAMES.卡卡罗:
-                if self.rank == 6 and self.params.cur_turn != 1:
+                if self.rank == len(match_cubes) and self.params.cur_turn != 1:
                     self.dice_point += 3
                     ability_active_notice(self.name.chara_name)
 
